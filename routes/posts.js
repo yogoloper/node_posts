@@ -56,14 +56,14 @@ router.get('/posts', async (req, res, next) => {
           },
         });
 
-        // 좋아요 있으면 추가
+        // 해당 유저의 좋아요 있으면 추가
         if (like != null) {
           posts[i].setDataValue('isLike', true);
         }
       }
     }
 
-    res.status(200).send({ posts });
+    return res.status(200).send({ posts });
   } catch (err) {
     console.log(err);
     next(err);
@@ -91,18 +91,20 @@ router.get('/posts/:postId', async (req, res, next) => {
       });
     }
 
-    // 댓글 조회
+    // 댓글 목록 조회
     const comments = await Comment.findAll({
       where: {
         post_id: postId,
         active: true,
       },
     });
+
+    // 댓글 목록이 존재한다면 게시글에 추가
     if (comments != null) {
       post.setDataValue('comments', comments);
     }
 
-    res.status(200).send(post);
+    return res.status(200).send(post);
   } catch (err) {
     console.log(err);
     next(err);
@@ -138,7 +140,6 @@ router.put('/posts/:postId', authMiddleware, async (req, res, next) => {
     // 게시글 수정
     const updatedPost = await Post.update(
       {
-        user_id: res.locals.userId,
         title,
         content,
         image_url,
@@ -147,6 +148,7 @@ router.put('/posts/:postId', authMiddleware, async (req, res, next) => {
       {
         where: {
           id: postId,
+          user_id: res.locals.userId,
         },
       }
     );
@@ -164,33 +166,57 @@ router.delete('/posts/:postId', authMiddleware, async (req, res, next) => {
     const { postId } = req.params;
     const { title, content, image_url } = req.body;
 
-    // 게시글 삭제 플레그 수정
-    const updatedPost = await Post.update(
-      {
-        active: false,
-        updated: Date.now(),
-      },
-      {
-        where: {
-          id: postId,
-        },
-      }
-    );
+    let updatedPost;
 
-    // 해당 게시글의 댓글들 삭제 플레그 수정
-    const updatedComment = await Comment.update(
-      {
-        active: false,
-        updated: Date.now(),
-      },
-      {
-        where: {
-          post_id: postId,
+    // 관리자일 경우 바로 삭제
+    if (res.locals.isAdmin) {
+      updatedPost = await Post.update(
+        {
+          active: false,
+          updated: Date.now(),
         },
-      }
-    );
+        {
+          where: {
+            id: postId,
+          },
+        }
+      );
+    }
 
-    return res.send(201);
+    // 일반유저일 경우 해당 유저가 작성한 것만 삭제
+    else {
+      // 게시글 삭제 플레그 수정
+      updatedPost = await Post.update(
+        {
+          active: false,
+          updated: Date.now(),
+        },
+        {
+          where: {
+            id: postId,
+            user_id: res.locals.userId,
+          },
+        }
+      );
+    }
+
+    // 업데이트 된 게시글이 있다면 해당 게시물의 댓글들도 모두 삭제
+    if (updatedPost[0]) {
+      // 해당 게시글의 댓글들 삭제 플레그 수정
+      const updatedComment = await Comment.update(
+        {
+          active: false,
+          updated: Date.now(),
+        },
+        {
+          where: {
+            post_id: postId,
+          },
+        }
+      );
+    }
+
+    return res.send(200);
   } catch (err) {
     console.log(err);
     next(err);
@@ -240,6 +266,7 @@ router.put(
           where: {
             id: commentId,
             post_id: postId,
+            user_id: res.locals.userId,
           },
         }
       );
@@ -260,21 +287,41 @@ router.delete(
     try {
       const { postId, commentId } = req.params;
 
-      // 댓글 삭제 플레그 수정
-      const updatedComment = await Comment.update(
-        {
-          active: false,
-          updated: Date.now(),
-        },
-        {
-          where: {
-            id: commentId,
-            post_id: postId,
+      // 관리자일 경우 바로 삭제
+      if (res.locals.isAdmin) {
+        // 댓글 삭제 플레그 수정
+        const updatedComment = await Comment.update(
+          {
+            active: false,
+            updated: Date.now(),
           },
-        }
-      );
+          {
+            where: {
+              id: commentId,
+              post_id: postId,
+            },
+          }
+        );
+      }
+      // 일반유저일 경우 해당 유저가 작성한 것만 삭제
+      else {
+        // 댓글 삭제 플레그 수정
+        const updatedComment = await Comment.update(
+          {
+            active: false,
+            updated: Date.now(),
+          },
+          {
+            where: {
+              id: commentId,
+              post_id: postId,
+              user_id: res.locals.userId,
+            },
+          }
+        );
+      }
 
-      return res.status(201).send({ updatedComment });
+      return res.status(200).send({ updatedComment });
     } catch (err) {
       console.log(err);
       next(err);
@@ -287,12 +334,21 @@ router.post('/posts/:postId/like', authMiddleware, async (req, res, next) => {
   try {
     const { postId } = req.params;
 
-    // 좋아요 작성
-    const createdLike = await Like.create({
-      user_id: res.locals.userId,
-      post_id: postId,
+    const existLike = await Like.findOne({
+      where: {
+        user_id: res.locals.userId,
+        post_id: postId,
+      },
     });
+    let createdLike;
 
+    if (!existLike) {
+      // 좋아요 작성
+      createdLike = await Like.upsert({
+        user_id: res.locals.userId,
+        post_id: postId,
+      });
+    }
     return res.status(201).send({ createdLike });
   } catch (err) {
     console.log(err);

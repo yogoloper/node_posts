@@ -16,11 +16,10 @@ app.use(cors());
 // }
 // app.use(cors(corsOptions));
 
-const authMiddleware = require('./middlewares/auth-middleware');
-
 // 라우터 정보 가져오기
 const postsRouter = require('./routes/posts');
 const usersRouter = require('./routes/users');
+const adminsRouter = require('./routes/admins');
 
 sequelize
   .sync({ force: false })
@@ -41,7 +40,7 @@ app.use(requestMiddleware);
 app.use(express.json());
 
 // api 경로시 배열에 있는 라우터 순서대로 우선순위를 정한다.
-app.use('/api', [postsRouter, usersRouter]);
+app.use('/api', [postsRouter, usersRouter, adminsRouter]);
 
 app.listen(port, () => {
   console.log(port, '포트로 서버가 생성되었습니다.');

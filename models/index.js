@@ -7,7 +7,6 @@ const Post = require('./post');
 const Comment = require('./comment');
 const Like = require('./like');
 
-
 const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
