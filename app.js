@@ -1,8 +1,20 @@
 const express = require('express');
 const app = express();
 const port = 3000;
+const cors = require('cors');
 
 const { sequelize } = require('./models');
+
+// cors 처리
+// 모든 도메인에서 제한 없이 요청 받기
+app.use(cors());
+
+// 특정 도멘에게서만 요청 받기
+// let corsOptions = {
+//   origin: 'https://www.domain.com',
+//   credentials: true
+// }
+// app.use(cors(corsOptions));
 
 const authMiddleware = require('./middlewares/auth-middleware');
 
@@ -10,13 +22,14 @@ const authMiddleware = require('./middlewares/auth-middleware');
 const postsRouter = require('./routes/posts');
 const usersRouter = require('./routes/users');
 
-sequelize.sync({ force: false })
-.then(() => {
-  console.log('Database connected..');
-})
-.catch((err) => {
-  console.log(err)
-})
+sequelize
+  .sync({ force: false })
+  .then(() => {
+    console.log('Database connected..');
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 // 접속 경로 로그 미들웨어
 const requestMiddleware = (req, res, next) => {
