@@ -103,7 +103,10 @@ router.post('/users/login', unAuthMiddleware, async (req, res, next) => {
     return res
       .header('authorization', 'Bearer ' + token)
       .status(201)
-      .send({ success: true });
+      .send({
+        nickname: existUser.nickname,
+        isAdmin: false
+      });
   } catch (err) {
     console.log(err);
     next(err);

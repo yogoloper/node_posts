@@ -12,17 +12,17 @@ module.exports = class Comment extends Sequelize.Model {
           type: Sequelize.TINYINT,
           defaultValue: true,
         },
-        created: {
+        createdAt: {
           type: Sequelize.DATE,
           defaultValue: Date.now(),
           get() {
-            return moment(this.getDataValue('created')).format('YYYY-MM-DD HH:mm:ss');
+            return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss');
           }
         },
-        updated: {
+        updatedAt: {
           type: Sequelize.DATE,
           get() {
-            return moment(this.getDataValue('updated')).format('YYYY-MM-DD HH:mm:ss');
+            return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss');
           }
         }
       },

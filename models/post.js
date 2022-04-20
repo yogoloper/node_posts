@@ -12,7 +12,7 @@ module.exports = class Post extends Sequelize.Model {
         content: {
           type: Sequelize.TEXT,
         },
-        image_url: {
+        imageUrl: {
           type: Sequelize.STRING(255),
         },
         active: {
@@ -23,17 +23,17 @@ module.exports = class Post extends Sequelize.Model {
           type: Sequelize.STRING(10),
           defaultValue: 'top'
         },
-        created: {
+        createdAt: {
           type: Sequelize.DATE,
           defaultValue: Date.now(),
           get() {
-            return moment(this.getDataValue('created')).format('YYYY-MM-DD HH:mm:ss');
+            return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss');
           }
         },
-        updated: {
+        updatedAt: {
           type: Sequelize.DATE,
           get() {
-            return moment(this.getDataValue('updated')).format('YYYY-MM-DD HH:mm:ss');
+            return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss');
           }
         }
       },

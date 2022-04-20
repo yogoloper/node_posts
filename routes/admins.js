@@ -36,7 +36,10 @@ router.post('/admins/login', async (req, res, next) => {
     return res
       .header('authorization', 'Bearer ' + token)
       .status(201)
-      .send({ success: true });
+      .send({
+        nickname: existUser.nickname,
+        isAdmin: true,
+      });
   } catch (err) {
     console.log(err);
     next(err);

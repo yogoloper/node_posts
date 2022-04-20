@@ -15,7 +15,7 @@ module.exports = class User extends Sequelize.Model {
           allowNull: false,
           comment: '비밀번호',
         },
-        image_url: {
+        imageUrl: {
           type: Sequelize.STRING(255),
           comment: '사용자 프로필 URL',
         },

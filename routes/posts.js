@@ -32,7 +32,7 @@ router.get('/posts', async (req, res, next) => {
       where: {
         active: true,
       },
-      order: [['created', 'desc']]
+      order: [['createdAt', 'desc']],
     });
 
     // 해당 유저의 좋아요 확인
@@ -72,8 +72,6 @@ router.get('/posts', async (req, res, next) => {
           posts[i].setDataValue('isLike', true);
         }
       }
-
-
     }
 
     return res.status(200).send({ posts });
@@ -110,7 +108,7 @@ router.get('/posts/:postId', async (req, res, next) => {
         post_id: postId,
         active: true,
       },
-      order: [['created', 'desc']]
+      order: [['createdAt', 'desc']],
     });
 
     // 댓글 목록이 존재한다면 게시글에 추가
@@ -118,7 +116,7 @@ router.get('/posts/:postId', async (req, res, next) => {
       post.setDataValue('comments', comments);
     }
 
-    return res.status(200).send(post);
+    return res.status(200).send({ post });
   } catch (err) {
     console.log(err);
     next(err);
@@ -138,7 +136,7 @@ router.post('/posts', authMiddleware, async (req, res, next) => {
       image_url,
     });
 
-    return res.status(201).send({ createdPost });
+    return res.status(201).send();
   } catch (err) {
     console.log(err);
     next(err);
@@ -167,7 +165,7 @@ router.put('/posts/:postId', authMiddleware, async (req, res, next) => {
       }
     );
 
-    return res.send(201);
+    return res.status(201).send();
   } catch (err) {
     console.log(err);
     next(err);
@@ -230,7 +228,7 @@ router.delete('/posts/:postId', authMiddleware, async (req, res, next) => {
       );
     }
 
-    return res.send(200);
+    return res.ststus(200).send();
   } catch (err) {
     console.log(err);
     next(err);
@@ -253,7 +251,7 @@ router.post(
         content,
       });
 
-      return res.status(201).send({ createdComment });
+      return res.status(201).send();
     } catch (err) {
       console.log(err);
       next(err);
@@ -285,7 +283,7 @@ router.put(
         }
       );
 
-      return res.status(201).send({ updatedComment });
+      return res.status(201).send();
     } catch (err) {
       console.log(err);
       next(err);
@@ -335,7 +333,7 @@ router.delete(
         );
       }
 
-      return res.status(200).send({ updatedComment });
+      return res.status(200).send();
     } catch (err) {
       console.log(err);
       next(err);
@@ -363,7 +361,7 @@ router.post('/posts/:postId/like', authMiddleware, async (req, res, next) => {
         post_id: postId,
       });
     }
-    return res.status(201).send({ createdLike });
+    return res.status(201).send();
   } catch (err) {
     console.log(err);
     next(err);
@@ -383,7 +381,7 @@ router.delete('/posts/:postId/like', authMiddleware, async (req, res, next) => {
       },
     });
 
-    return res.status(200).send({ deletedLike });
+    return res.status(200).send();
   } catch (err) {
     console.log(err);
     next(err);
