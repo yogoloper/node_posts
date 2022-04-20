@@ -19,6 +19,10 @@ module.exports = class Post extends Sequelize.Model {
           type: Sequelize.TINYINT,
           defaultValue: true,
         },
+        layout: {
+          type: Sequelize.STRING(10),
+          defaultValue: 'top'
+        },
         created: {
           type: Sequelize.DATE,
           defaultValue: Date.now(),

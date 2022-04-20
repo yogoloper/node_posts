@@ -9,6 +9,7 @@ const Like = require('../models/like');
 const router = express.Router();
 
 const authMiddleware = require('../middlewares/auth-middleware');
+const { sequelize } = require('../models');
 
 // 게시글 목록 조회
 router.get('/posts', async (req, res, next) => {
@@ -31,14 +32,15 @@ router.get('/posts', async (req, res, next) => {
       where: {
         active: true,
       },
+      order: [['created', 'desc']]
     });
 
-    // 좋아요수, 해당 유저의 좋아요 확인
-    let likeCnt = 0;
+    // 해당 유저의 좋아요 확인
     let isLike = false;
 
-    // 반복문을 돌면서 좋아요 체크
+    // 반복문을 돌면서 좋아요, 좋아요수, 댓글수 저장
     for (let i = 0; i < posts.length; i++) {
+      // 해당 게시물의 좋아요 조회
       const likes = await Like.findAll({
         where: {
           post_id: posts[i].getDataValue('id'),
@@ -47,7 +49,16 @@ router.get('/posts', async (req, res, next) => {
       // 좋아요수 추가
       posts[i].setDataValue('likeCnt', likes.length);
 
-      // 유저가 존재하면 해당 게시물에 좋아요 확인
+      // 해당 게시물의 댓글 조회
+      const comments = await Comment.findAll({
+        where: {
+          post_id: posts[i].getDataValue('id'),
+        },
+      });
+      // 댓글수 추가
+      posts[i].setDataValue('commentCnt', comments.length);
+
+      // 유저가 존재하면 해당 게시물에 좋아요 있는지 확인
       if (user != null) {
         const like = await Like.findOne({
           where: {
@@ -61,6 +72,8 @@ router.get('/posts', async (req, res, next) => {
           posts[i].setDataValue('isLike', true);
         }
       }
+
+
     }
 
     return res.status(200).send({ posts });
@@ -97,6 +110,7 @@ router.get('/posts/:postId', async (req, res, next) => {
         post_id: postId,
         active: true,
       },
+      order: [['created', 'desc']]
     });
 
     // 댓글 목록이 존재한다면 게시글에 추가
