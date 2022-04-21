@@ -223,14 +223,14 @@ router.get('/posts/:postId', async (req, res, next) => {
 // 게시글 작성
 router.post('/posts', authMiddleware, async (req, res, next) => {
   try {
-    const { title, content, image_url } = req.body;
+    const { title, content, imageUrl } = req.body;
 
     // 게시글 작성
     const createdPost = await Post.create({
       user_id: res.locals.userId,
       title,
       content,
-      image_url,
+      imageUrl,
     });
 
     return res.status(201).send();
@@ -244,14 +244,14 @@ router.post('/posts', authMiddleware, async (req, res, next) => {
 router.put('/posts/:postId', authMiddleware, async (req, res, next) => {
   try {
     const { postId } = req.params;
-    const { title, content, image_url } = req.body;
+    const { title, content, imageUrl } = req.body;
 
     // 게시글 수정
     const updatedPost = await Post.update(
       {
         title,
         content,
-        image_url,
+        imageUrl,
         updated: Date.now(),
       },
       {
@@ -273,7 +273,7 @@ router.put('/posts/:postId', authMiddleware, async (req, res, next) => {
 router.delete('/posts/:postId', authMiddleware, async (req, res, next) => {
   try {
     const { postId } = req.params;
-    const { title, content, image_url } = req.body;
+    const { title, content, imageUrl } = req.body;
 
     let updatedPost;
 

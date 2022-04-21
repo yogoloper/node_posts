@@ -9,7 +9,7 @@ const unAuthMiddleware = require('../middlewares/unauth-middleware');
 // 사용자 회원가입
 router.post('/users/register', unAuthMiddleware, async (req, res) => {
   try {
-    const { nickname, password, passwordConfirm, image_url } = req.body;
+    const { nickname, password, passwordConfirm, imageUrl } = req.body;
 
     const check_spc = /[~!@#$%^&*()_+|<>?:{}]/; // 특수문자
     const check_kor = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/; // 한글체크
@@ -62,7 +62,7 @@ router.post('/users/register', unAuthMiddleware, async (req, res) => {
     const createdUser = await User.create({
       nickname,
       password,
-      image_url,
+      imageUrl,
     });
 
     return res.send(201).send();
@@ -99,7 +99,7 @@ router.post('/users/login', unAuthMiddleware, async (req, res, next) => {
     );
 
     // token은 헤더에 담아서 전달,
-    // nickname, image_url, admin 여부는 바디로 전달
+    // nickname, imageUrl, admin 여부는 바디로 전달
     return res
       .header('authorization', 'Bearer ' + token)
       .status(201)

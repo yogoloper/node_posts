@@ -32,7 +32,7 @@ router.post('/admins/login', async (req, res, next) => {
     );
 
     // token은 헤더에 담아서 전달,
-    // nickname, image_url, admin 여부는 바디로 전달
+    // nickname, imageUrl, admin 여부는 바디로 전달
     return res
       .header('authorization', 'Bearer ' + token)
       .status(201)
