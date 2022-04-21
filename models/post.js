@@ -21,21 +21,25 @@ module.exports = class Post extends Sequelize.Model {
         },
         layout: {
           type: Sequelize.STRING(10),
-          defaultValue: 'top'
+          defaultValue: 'top',
         },
         createdAt: {
           type: Sequelize.DATE,
           defaultValue: Date.now(),
           get() {
-            return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss');
-          }
+            return moment(this.getDataValue('createdAt')).format(
+              'YYYY-MM-DD HH:mm:ss'
+            );
+          },
         },
         updatedAt: {
           type: Sequelize.DATE,
           get() {
-            return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss');
-          }
-        }
+            return moment(this.getDataValue('updatedAt')).format(
+              'YYYY-MM-DD HH:mm:ss'
+            );
+          },
+        },
       },
       {
         sequelize,

@@ -2,6 +2,7 @@ const express = require('express');
 
 const jwt = require('jsonwebtoken');
 
+const User = require('../models/user');
 const Post = require('../models/post');
 const Comment = require('../models/comment');
 const Like = require('../models/like');
@@ -29,6 +30,7 @@ router.get('/posts', async (req, res, next) => {
 
     // 게시물 목록 조회
     const posts = await Post.findAll({
+      raw: true,
       where: {
         active: true,
       },
@@ -40,37 +42,56 @@ router.get('/posts', async (req, res, next) => {
 
     // 반복문을 돌면서 좋아요, 좋아요수, 댓글수 저장
     for (let i = 0; i < posts.length; i++) {
+      // 유저 닉네임 조회
+      const existUser = await User.findOne({
+        raw: true,
+        where: {
+          id: posts[i].user_id,
+        },
+      });
+
+      // 유저 닉네임 삽입
+      posts[i].nickname = existUser.nickname;
+
       // 해당 게시물의 좋아요 조회
       const likes = await Like.findAll({
         where: {
-          post_id: posts[i].getDataValue('id'),
+          // post_id: posts[i].getDataValue('id'),
+          post_id: posts[i].id,
         },
       });
       // 좋아요수 추가
-      posts[i].setDataValue('likeCnt', likes.length);
+      posts[i].likeCnt = likes.length;
 
       // 해당 게시물의 댓글 조회
       const comments = await Comment.findAll({
         where: {
-          post_id: posts[i].getDataValue('id'),
+          // post_id: posts[i].getDataValue('id'),
+          post_id: posts[i].id,
         },
       });
       // 댓글수 추가
-      posts[i].setDataValue('commentCnt', comments.length);
+      posts[i].commentCnt = comments.length;
+      posts[i].postId = posts[i].id;
 
       // 유저가 존재하면 해당 게시물에 좋아요 있는지 확인
       if (user != null) {
         const like = await Like.findOne({
           where: {
-            post_id: posts[i].getDataValue('id'),
+            post_id: posts[i].id,
             user_id: user.userId,
           },
         });
 
         // 해당 유저의 좋아요 있으면 추가
         if (like != null) {
-          posts[i].setDataValue('isLike', true);
+          posts[i].isLike = true;
         }
+
+        // 게시글 목록에 불필요한 값 삭제
+        posts[i].id = undefined;
+        posts[i].user_id = undefined;
+        posts[i].active = undefined;
       }
     }
 
@@ -84,9 +105,23 @@ router.get('/posts', async (req, res, next) => {
 // 게시글 상세 조회
 router.get('/posts/:postId', async (req, res, next) => {
   try {
+    // 토큰이 있으면 userId 추출
+    let user;
+    const { authorization } = req.headers;
+
+    if (authorization != null) {
+      const [tokenType, token] = authorization.split(' ');
+
+      // 토큰 타입이 다르면 401 반환
+      if (tokenType && tokenType === 'Bearer') {
+        user = jwt.verify(token, 'secretKey');
+      }
+    }
+
     const { postId } = req.params;
     // 게시글 상세 조회
     const post = await Post.findOne({
+      raw: true,
       where: {
         id: postId,
         active: true,
@@ -102,8 +137,43 @@ router.get('/posts/:postId', async (req, res, next) => {
       });
     }
 
+    // 유저 닉네임 조회
+    const existUser = await User.findOne({
+      raw: true,
+      where: {
+        id: post.user_id,
+      },
+    });
+    post.nickname = existUser.nickname;
+
+    // 해당 게시물의 좋아요 조회
+    const likes = await Like.findAll({
+      where: {
+        // post_id: posts[i].getDataValue('id'),
+        post_id: post.id,
+      },
+    });
+    // 좋아요수 추가
+    post.likeCnt = likes.length;
+
+    // 유저가 존재하면 해당 게시물에 좋아요 있는지 확인
+    if (user != null) {
+      const like = await Like.findOne({
+        where: {
+          post_id: post.id,
+          user_id: user.userId,
+        },
+      });
+
+      // 해당 유저의 좋아요 있으면 추가
+      if (like != null) {
+        post.isLike = true;
+      }
+    }
+
     // 댓글 목록 조회
     const comments = await Comment.findAll({
+      raw: true,
       where: {
         post_id: postId,
         active: true,
@@ -113,8 +183,35 @@ router.get('/posts/:postId', async (req, res, next) => {
 
     // 댓글 목록이 존재한다면 게시글에 추가
     if (comments != null) {
-      post.setDataValue('comments', comments);
+      for (let i = 0; i < comments.length; i++) {
+        // 유저 닉네임 조회
+        const existUser = await User.findOne({
+          raw: true,
+          where: {
+            id: comments[i].user_id,
+          },
+        });
+
+        // 댓글 목록에 필요한 값 삽입
+        comments[i].nickname = existUser.nickname;
+        comments[i].commentId = comments[i].id;
+
+        // 댓글 목록에 불필요한 값 삭제
+        comments[i].post_id = undefined;
+        comments[i].user_id = undefined;
+        comments[i].id = undefined;
+        comments[i].active = undefined;
+      }
     }
+
+    // 게시글에 필요한 값 삽입
+    post.postId = post.id;
+    post.comments = comments;
+
+    // 게시글에 불필요한 값 삭제
+    post.id = undefined;
+    post.user_id = undefined;
+    post.active = undefined;
 
     return res.status(200).send({ post });
   } catch (err) {

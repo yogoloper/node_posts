@@ -39,6 +39,7 @@ router.post('/admins/login', async (req, res, next) => {
       .send({
         nickname: existUser.nickname,
         isAdmin: true,
+        token,
       });
   } catch (err) {
     console.log(err);

@@ -105,7 +105,8 @@ router.post('/users/login', unAuthMiddleware, async (req, res, next) => {
       .status(201)
       .send({
         nickname: existUser.nickname,
-        isAdmin: false
+        isAdmin: false,
+        token,
       });
   } catch (err) {
     console.log(err);
