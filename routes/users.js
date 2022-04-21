@@ -9,16 +9,12 @@ const unAuthMiddleware = require('../middlewares/unauth-middleware');
 // 사용자 회원가입
 router.post('/users/register', unAuthMiddleware, async (req, res) => {
   try {
+    console.log(req.body);
     const { nickname, password, confirmPassword, imageUrl } = req.body;
-
-    console.log(nickname, password, confirmPassword, imageUrl)
-
-    console.log(1);
 
     const check_spc = /[~!@#$%^&*()_+|<>?:{}]/; // 특수문자
     const check_kor = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/; // 한글체크
 
-    console.log(2);
     // 닉네임은 길이 3자 이상의 영문, 숫자로 구성
     if (
       nickname.length < 3 ||
@@ -31,7 +27,6 @@ router.post('/users/register', unAuthMiddleware, async (req, res) => {
       });
     }
 
-    console.log(3);
     // 비밀번호는 4자 이상, 닉네임에 포함되지 않은 값으로 구성
     if (password.length < 4 || nickname.search(password) >= 0) {
       return res.status(400).send({
@@ -50,7 +45,6 @@ router.post('/users/register', unAuthMiddleware, async (req, res) => {
       });
     }
 
-    console.log(5);
     // 유저 검색
     const existUsers = await User.findAll({
       where: {
@@ -58,7 +52,6 @@ router.post('/users/register', unAuthMiddleware, async (req, res) => {
       },
     });
 
-    console.log(6);
     // 해당 메일, 닉네임으로 가입된 회원이 있으면 400 반환
     if (existUsers.length > 0) {
       return res.status(400).send({
@@ -67,7 +60,6 @@ router.post('/users/register', unAuthMiddleware, async (req, res) => {
       });
     }
 
-    console.log(7);
     // 사용자 회원가입
     const createdUser = await User.create({
       nickname,
@@ -75,7 +67,6 @@ router.post('/users/register', unAuthMiddleware, async (req, res) => {
       imageUrl,
     });
 
-    console.log(8);
     return res.send(201).send();
   } catch (err) {
     console.log(err);
@@ -86,6 +77,7 @@ router.post('/users/register', unAuthMiddleware, async (req, res) => {
 // 사용자 로그인
 router.post('/users/login', unAuthMiddleware, async (req, res, next) => {
   try {
+    console.log(req.body)
     const { nickname, password } = req.body;
 
     // 유저 검색

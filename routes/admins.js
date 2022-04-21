@@ -8,6 +8,7 @@ const authMiddleware = require('../middlewares/auth-middleware');
 // 관리자 로그인
 router.post('/admins/login', async (req, res, next) => {
   try {
+    console.log(req.body);
     const { nickname, password } = req.body;
 
     // 관리자 검색

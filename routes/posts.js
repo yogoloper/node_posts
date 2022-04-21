@@ -105,6 +105,7 @@ router.get('/posts', async (req, res, next) => {
 // 게시글 상세 조회
 router.get('/posts/:postId', async (req, res, next) => {
   try {
+    console.log(req.params);
     // 토큰이 있으면 userId 추출
     let user;
     const { authorization } = req.headers;
@@ -223,6 +224,7 @@ router.get('/posts/:postId', async (req, res, next) => {
 // 게시글 작성
 router.post('/posts', authMiddleware, async (req, res, next) => {
   try {
+    console.log(req.body);
     const { title, content, imageUrl } = req.body;
 
     // 게시글 작성
@@ -243,6 +245,7 @@ router.post('/posts', authMiddleware, async (req, res, next) => {
 // 게시글 수정
 router.put('/posts/:postId', authMiddleware, async (req, res, next) => {
   try {
+    console.log(req.params, req.body);
     const { postId } = req.params;
     const { title, content, imageUrl } = req.body;
 
@@ -272,8 +275,8 @@ router.put('/posts/:postId', authMiddleware, async (req, res, next) => {
 // 게시글 삭제
 router.delete('/posts/:postId', authMiddleware, async (req, res, next) => {
   try {
+    console.log(req.params);
     const { postId } = req.params;
-    const { title, content, imageUrl } = req.body;
 
     let updatedPost;
 
@@ -338,6 +341,7 @@ router.post(
   authMiddleware,
   async (req, res, next) => {
     try {
+      console.log(req.params, req.body);
       const { postId } = req.params;
       const { content } = req.body;
 
@@ -362,6 +366,7 @@ router.put(
   authMiddleware,
   async (req, res, next) => {
     try {
+      console.log(req.params, req.body);
       const { postId, commentId } = req.params;
       const { content } = req.body;
 
@@ -394,6 +399,7 @@ router.delete(
   authMiddleware,
   async (req, res, next) => {
     try {
+      console.log(req.params);
       const { postId, commentId } = req.params;
 
       // 관리자일 경우 바로 삭제
@@ -441,6 +447,7 @@ router.delete(
 // 좋아요 작성
 router.post('/posts/:postId/like', authMiddleware, async (req, res, next) => {
   try {
+    console.log(req.params);
     const { postId } = req.params;
 
     const existLike = await Like.findOne({
@@ -468,6 +475,7 @@ router.post('/posts/:postId/like', authMiddleware, async (req, res, next) => {
 // 좋아요 취소
 router.delete('/posts/:postId/like', authMiddleware, async (req, res, next) => {
   try {
+    console.log(req.params);
     const { postId } = req.params;
 
     // 좋아요 취소
