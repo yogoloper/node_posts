@@ -11,6 +11,8 @@ router.post('/users/register', unAuthMiddleware, async (req, res) => {
   try {
     const { nickname, password, passwordConfirm, imageUrl } = req.body;
 
+    console.log(nickname, password, passwordConfirm, imageUrl);
+
     console.log(1);
 
     const check_spc = /[~!@#$%^&*()_+|<>?:{}]/; // 특수문자
