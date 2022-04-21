@@ -77,7 +77,7 @@ router.post('/users/register', unAuthMiddleware, async (req, res) => {
 // 사용자 로그인
 router.post('/users/login', unAuthMiddleware, async (req, res, next) => {
   try {
-    console.log(req.body)
+    console.log(req.body);
     const { nickname, password } = req.body;
 
     // 유저 검색
@@ -117,4 +117,23 @@ router.post('/users/login', unAuthMiddleware, async (req, res, next) => {
   }
 });
 
+// 사용자 인증
+router.get('/users/auth', authMiddleware, async (req, res, next) => {
+  try {
+    // 유저 검색
+    const [existUser] = await User.findAll({
+      where: {
+        id: res.locals.userId,
+      },
+    });
+
+    return res.status(201).send({
+      nickname: existUser.nickname,
+      isAdmin: false,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+});
 module.exports = router;

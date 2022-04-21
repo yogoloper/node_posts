@@ -48,4 +48,24 @@ router.post('/admins/login', async (req, res, next) => {
   }
 });
 
+// 관리자 인증
+router.get('/admins/auth', authMiddleware, async (req, res, next) => {
+  try {
+    // 유저 검색
+    const [existAdmin] = await Admin.findAll({
+      where: {
+        id: res.locals.userId,
+      },
+    });
+
+    return res.status(201).send({
+      nickname: existAdmin.nickname,
+      isAdmin: true,
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+});
+
 module.exports = router;
