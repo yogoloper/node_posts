@@ -9,9 +9,9 @@ const unAuthMiddleware = require('../middlewares/unauth-middleware');
 // 사용자 회원가입
 router.post('/users/register', unAuthMiddleware, async (req, res) => {
   try {
-    const { nickname, password, passwordConfirm, imageUrl } = req.body;
+    const { nickname, password, confirmPassword, imageUrl } = req.body;
 
-    console.log(nickname, password, passwordConfirm, imageUrl);
+    console.log(nickname, password, confirmPassword, imageUrl)
 
     console.log(1);
 
@@ -43,7 +43,7 @@ router.post('/users/register', unAuthMiddleware, async (req, res) => {
 
     console.log(4);
     // 비밀번호가 일치 하지 않으면 실패
-    if (password !== passwordConfirm) {
+    if (password !== confirmPassword) {
       return res.status(400).send({
         success: false,
         message: '비밀번호가 일치하지 않습니다.',
