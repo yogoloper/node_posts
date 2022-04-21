@@ -195,6 +195,7 @@ router.get('/posts/:postId', async (req, res, next) => {
 
         // 댓글 목록에 필요한 값 삽입
         comments[i].nickname = existUser.nickname;
+        comments[i].imageUrl = existUser.imageUrl;
         comments[i].commentId = comments[i].id;
 
         // 댓글 목록에 불필요한 값 삭제
