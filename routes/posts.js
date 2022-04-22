@@ -236,7 +236,7 @@ router.post('/posts', authMiddleware, async (req, res, next) => {
       imageUrl,
     });
 
-    return res.status(201).send();
+    return res.status(201).send({postId: createdPost.id});
   } catch (err) {
     console.log(err);
     next(err);
