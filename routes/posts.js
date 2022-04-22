@@ -34,7 +34,7 @@ router.get('/posts', async (req, res, next) => {
       where: {
         active: true,
       },
-      order: [['createdAt', 'desc']],
+      order: [['id', 'desc']],
     });
 
     // 해당 유저의 좋아요 확인
@@ -95,6 +95,8 @@ router.get('/posts', async (req, res, next) => {
       posts[i].user_id = undefined;
       posts[i].active = undefined;
     }
+
+    console.log(posts)
 
     return res.status(200).send({ posts });
   } catch (err) {
@@ -181,7 +183,7 @@ router.get('/posts/:postId', async (req, res, next) => {
         post_id: postId,
         active: true,
       },
-      order: [['createdAt', 'desc']],
+      order: [['id', 'desc']],
     });
 
     // 댓글 목록이 존재한다면 게시글에 추가
