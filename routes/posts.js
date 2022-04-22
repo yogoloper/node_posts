@@ -248,7 +248,7 @@ router.put('/posts/:postId', authMiddleware, async (req, res, next) => {
   try {
     console.log(req.params, req.body);
     const { postId } = req.params;
-    const { title, content, imageUrl } = req.body;
+    const { title, content, imageUrl, layout } = req.body;
 
     // 게시글 수정
     const updatedPost = await Post.update(
@@ -256,6 +256,7 @@ router.put('/posts/:postId', authMiddleware, async (req, res, next) => {
         title,
         content,
         imageUrl,
+        layout, 
         updated: Date.now(),
       },
       {
