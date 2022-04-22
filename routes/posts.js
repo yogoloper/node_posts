@@ -73,6 +73,7 @@ router.get('/posts', async (req, res, next) => {
       // 댓글수 추가
       posts[i].commentCnt = comments.length;
       posts[i].postId = posts[i].id;
+      posts[i].isLike = false;
 
       // 유저가 존재하면 해당 게시물에 좋아요 있는지 확인
       if (user != null) {
@@ -87,12 +88,12 @@ router.get('/posts', async (req, res, next) => {
         if (like != null) {
           posts[i].isLike = true;
         }
-
-        // 게시글 목록에 불필요한 값 삭제
-        posts[i].id = undefined;
-        posts[i].user_id = undefined;
-        posts[i].active = undefined;
       }
+
+      // 게시글 목록에 불필요한 값 삭제
+      posts[i].id = undefined;
+      posts[i].user_id = undefined;
+      posts[i].active = undefined;
     }
 
     return res.status(200).send({ posts });
@@ -156,6 +157,7 @@ router.get('/posts/:postId', async (req, res, next) => {
     });
     // 좋아요수 추가
     post.likeCnt = likes.length;
+    post.isLike = false;
 
     // 유저가 존재하면 해당 게시물에 좋아요 있는지 확인
     if (user != null) {
@@ -236,7 +238,7 @@ router.post('/posts', authMiddleware, async (req, res, next) => {
       imageUrl,
     });
 
-    return res.status(201).send({postId: createdPost.id});
+    return res.status(201).send({ postId: createdPost.id });
   } catch (err) {
     console.log(err);
     next(err);
@@ -256,7 +258,7 @@ router.put('/posts/:postId', authMiddleware, async (req, res, next) => {
         title,
         content,
         imageUrl,
-        layout, 
+        layout,
         updated: Date.now(),
       },
       {
@@ -354,7 +356,7 @@ router.post(
         content,
       });
 
-      return res.status(201).send();
+      return res.status(201).send({ commentId: createdComment.id });
     } catch (err) {
       console.log(err);
       next(err);
