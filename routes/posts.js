@@ -1,6 +1,7 @@
 const express = require('express');
 
 const jwt = require('jsonwebtoken');
+const moment = require('moment');
 
 const User = require('../models/user');
 const Post = require('../models/post');
@@ -52,6 +53,13 @@ router.get('/posts', async (req, res, next) => {
 
       // 유저 닉네임 삽입
       posts[i].nickname = existUser.nickname;
+      posts[i].createdAt = moment(posts[i].createdAt).format(
+        'YYYY-MM-DD HH:mm:ss'
+      );
+      posts[i].updatedAt =
+        posts[i].updatedAt != null
+          ? moment(posts[i].updatedAt).format('YYYY-MM-DD HH:mm:ss')
+          : undefined;
 
       // 해당 게시물의 좋아요 조회
       const likes = await Like.findAll({
@@ -95,8 +103,6 @@ router.get('/posts', async (req, res, next) => {
       posts[i].user_id = undefined;
       posts[i].active = undefined;
     }
-
-    console.log(posts)
 
     return res.status(200).send({ posts });
   } catch (err) {
@@ -201,6 +207,13 @@ router.get('/posts/:postId', async (req, res, next) => {
         comments[i].nickname = existUser.nickname;
         comments[i].imageUrl = existUser.imageUrl;
         comments[i].commentId = comments[i].id;
+        comments[i].createdAt = moment(comments[i].createdAt).format(
+          'YYYY-MM-DD HH:mm:ss'
+        );
+        comments[i].updatedAt =
+        comments[i].updatedAt != null
+            ? moment(comments[i].updatedAt).format('YYYY-MM-DD HH:mm:ss')
+            : undefined;
 
         // 댓글 목록에 불필요한 값 삭제
         comments[i].post_id = undefined;
