@@ -211,7 +211,7 @@ router.get('/posts/:postId', async (req, res, next) => {
           'YYYY-MM-DD HH:mm:ss'
         );
         comments[i].updatedAt =
-        comments[i].updatedAt != null
+          comments[i].updatedAt != null
             ? moment(comments[i].updatedAt).format('YYYY-MM-DD HH:mm:ss')
             : undefined;
 
@@ -243,7 +243,7 @@ router.get('/posts/:postId', async (req, res, next) => {
 router.post('/posts', authMiddleware, async (req, res, next) => {
   try {
     console.log(req.body);
-    const { title, content, imageUrl } = req.body;
+    const { title, content, imageUrl, layout } = req.body;
 
     // 게시글 작성
     const createdPost = await Post.create({
@@ -251,6 +251,7 @@ router.post('/posts', authMiddleware, async (req, res, next) => {
       title,
       content,
       imageUrl,
+      layout,
     });
 
     return res.status(201).send({ postId: createdPost.id });
