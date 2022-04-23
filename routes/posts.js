@@ -64,7 +64,6 @@ router.get('/posts', async (req, res, next) => {
       // 해당 게시물의 좋아요 조회
       const likes = await Like.findAll({
         where: {
-          // post_id: posts[i].getDataValue('id'),
           post_id: posts[i].id,
         },
       });
@@ -74,8 +73,8 @@ router.get('/posts', async (req, res, next) => {
       // 해당 게시물의 댓글 조회
       const comments = await Comment.findAll({
         where: {
-          // post_id: posts[i].getDataValue('id'),
           post_id: posts[i].id,
+          active: true,
         },
       });
       // 댓글수 추가
